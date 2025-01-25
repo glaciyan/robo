@@ -20,10 +20,12 @@ class Robot:
     def forward_kinematics(self, alpha=np.radians(0), beta_1=np.radians(0), beta_2=np.radians(0)):
         p_a2 = (0, 0, 0, 1)
         TR_0 = trans(np.array([self.x_r, self.y_r, self.r])) @ rot2trans(rotz(self.theta))
-        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha)) @ rot2trans(rotx(np.radians(90)))
+        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha)) 
+        TR_R = rot2trans(rotx(np.radians(90)))
         TR_A1 = rot2trans(rotz(beta_1)) @ trans(np.array([self.l_1, 0, 0]))
         TR_A2 = rot2trans(rotz(beta_2)) @ trans(np.array([self.l_2, 0, 0]))
-        TR = TR_0 @ TR_D @ TR_A1 @ TR_A2
+        # TR = TR_0 @ TR_D @ TR_R @ TR_A1 @ TR_A2
+        TR = TR_R @ TR_A1 @ TR_A2
         p_a0 = TR @ p_a2
         return p_a0
 
@@ -76,24 +78,13 @@ def joint_angles_for_circle_motion(robot, km_r=(1, 0, 0.55, 1), radius=0.25, pos
     return alphas, beta_1s, beta_2s
 
 
-def plot_angles(alphas, beta_1s, beta_2s, positions_in_circle=100):
-    point_range = np.linspace(0, 360, positions_in_circle)
-    plt.figure()
-    plt.xlabel("Positionen im Kreis in Grad")
-    plt.ylabel("Winkeleinstellungen in Grad")
-    plt.plot(point_range, np.rad2deg(alphas), label='alpha')
-    plt.plot(point_range, np.rad2deg(beta_1s), label='beta_1')
-    plt.plot(point_range, np.rad2deg(beta_2s), label='beta_2')
-    plt.legend()
-    plt.savefig("plots/gelenkwinkel.png")
-
-
 def plot_circle(reached_points):
     plt.figure(figsize=(10,10))
     plt.xlabel("x")
     plt.ylabel("z")
     plt.axis("equal")
     plt.plot(reached_points[:, 0], reached_points[:, 2], marker='', linestyle='-', markersize=3)
+    plt.scatter([0], [0], color='r')
     plt.savefig("plots/kreis.png")
 
 
