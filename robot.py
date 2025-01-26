@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from transformations import *
 
+class OutOfWorkspace(Exception):
+    def __init__(self):
+        pass
+
+
 class Robot:
     def __init__(self, x_r=2, y_r=1, theta=np.radians(30), l=0.6, h=0.2, r=0.1, a=0.0, b=0.0, l_1=0.6, l_2=0.4):
         self.x_r = x_r
@@ -39,7 +44,7 @@ class Robot:
         return p_a0
 
     # Exercise 2.2
-    def inverse_kinematics(self, p_r):
+    def inverse_kinematics(self, p_r, elbow_up = True):
         p_a2 = (0, 0, 0, 1)
         TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b]))
         base = TR_D @ p_a2
@@ -50,7 +55,7 @@ class Robot:
         if a > self.l_1+self.l_2:
             raise ValueError
 
-        e = -1
+        e = -1 if elbow_up else 1
         c = (a**2 - self.l_1**2 - self.l_2**2) / (2 * self.l_1)
         b = e * np.sqrt(self.l_2**2 - c**2)
 
@@ -61,7 +66,8 @@ class Robot:
         polar = np.arcsin(cc[2] / sphere_radius)
 
         beta_1 = polar - np.arctan2(b, self.l_1 + c)
-        # TODO throw error when outside of working space
+        if beta_1 < self.beta_1_limit[0] or beta_1 > self.beta_1_limit[1]:
+            raise OutOfWorkspace
 
         alpha = azimuth
 
@@ -82,4 +88,4 @@ class Robot:
         TR_A2 = rot2trans(rotz(beta_2)) @ trans(np.array([self.l_2, 0, 0]))
         TR = T_BASE @ TR_A1 @ TR_A2
         j2 = TR @ p_a2 # tcp
-        return base, j1, j2
+        return base[0:3], j1[0:3], j2[0:3]
