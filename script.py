@@ -17,10 +17,10 @@ def plot_alpha_shape(filename: str, robot: Robot):
     plt.axis("equal")
 
     x, y = alpha_shape_geom.exterior.xy
-    plt.fill(x, y, color='lightblue', alpha=0.5, label="Working Area")
+    plt.fill(x, y, facecolor="gray", edgecolor="black", alpha=0.5, label="Working Area")
 
     base, j1, j2 = robot.get_points(0, np.deg2rad(50), np.deg2rad(-50))
-    plt.plot(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), 'ro-', label="Pose")
+    plt.plot(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), 'ro-', label="Example Pose")
 
     plt.legend()
     plt.savefig("plots/work_area.png")
