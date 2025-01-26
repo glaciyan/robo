@@ -61,6 +61,7 @@ class Robot:
         polar = np.arcsin(cc[2] / sphere_radius)
 
         beta_1 = polar - np.arctan2(b, self.l_1 + c)
+        # TODO throw error when outside of working space
 
         alpha = azimuth
 
