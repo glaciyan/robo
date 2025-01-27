@@ -9,7 +9,7 @@ def plot_sim(robot: Robot):
     fig, axes = plt.subplots(1, 2, figsize=(20, 10))
 
     target_1 = [0.9, 0.0, -0.05, 1]
-    target_2 = [-0.2, 0.0, 0.25, 1]
+    target_2 = [-0.2, 0.3, 0.25, 1]
 
     alpha_auf, beta_1_auf, beta_2_auf = robot.inverse_kinematics(np.array(target_1), elbow_up=True)
     base_auf, j1_auf, j2_auf = robot.get_points(alpha_auf, beta_1_auf, beta_2_auf)
