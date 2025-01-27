@@ -1,78 +1,72 @@
 from manim import *
 import numpy as np
-from manim.utils.color.X11 import CYAN1, MAGENTA
+from robot import Robot
 
-from robot import Robot, OutOfWorkspace
-
-
-class RobotAnim(ThreeDScene):
+class Robo(ThreeDScene):
     def construct(self):
-        robot = Robot(x_r=0.0, y_r=0.0, theta=0, l=0, a=0, r=0, h=0, b=0)
+        # Initialize the robot
+        robot = Robot(x_r=0.0, y_r=0.0, theta=0)
 
-        size_multiplier = 4
-        # Set up 3D camera
+        # Set up 3D axes
+        self.set_camera_orientation(phi=75 * DEGREES, theta=-45 * DEGREES)
+        axes = ThreeDAxes(
+            x_range=[-1, 1, 0.2], y_range=[-1, 1, 0.2], z_range=[-1, 1, 0.2],
+            x_length=8, y_length=8, z_length=8
+        )
+        self.add(axes)
 
-        self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES, zoom=3)
+        # Define target points
+        target_1 = [0.9, 0.0, -0.05, 1]  # Pauf target
+        target_2 = [-0.2, 0.3, 0.25, 1]  # Pab target
 
-        # Parameters for the robot arm
-        link1_length = robot.l_1
-        link2_length = robot.l_2
-        base_position = ORIGIN
+        # Compute joint angles and positions for Target 1 (Pauf)
+        alpha_auf, beta_1_auf, beta_2_auf = robot.inverse_kinematics(np.array(target_1), elbow_up=True)
+        base_auf, j1_auf, j2_auf = robot.get_points(alpha_auf, beta_1_auf, beta_2_auf)
 
-        # Create the spinning plate
-        plate = Circle(radius=0.1, color=BLUE).set_fill(BLUE, opacity=0.3)
-        # plate.rotate(PI / 2, axis=RIGHT)  # Rotate plate to lie on the Z-plane
-        # plate_center_dot = Dot(base_position, color=WHITE)
+        # Compute joint angles and positions for Target 2 (Pab)
+        alpha_ab, beta_1_ab, beta_2_ab = robot.inverse_kinematics(np.array(target_2), elbow_up=True)
+        base_ab, j1_ab, j2_ab = robot.get_points(alpha_ab, beta_1_ab, beta_2_ab)
 
-        # Robot arm components
-        joint1 = Dot3D(base_position, color=RED)
-        link1 = Line(start=base_position, end=base_position + RIGHT * link1_length, color=GREEN)
-        joint2 = Dot3D(link1.get_end(), color=RED)
-        link2 = Line(start=link1.get_end(), end=link1.get_end() + RIGHT * link2_length, color=YELLOW)
-        end_effector = Dot3D(link2.get_end(), color=WHITE)
+        # Interpolate between Pauf and Pab
+        steps = 100  # You can adjust this if needed for smoother transitions
+        alpha_interp = np.linspace(alpha_auf, alpha_ab - np.deg2rad(360), steps)
+        beta_1_interp = np.linspace(beta_1_auf, beta_1_ab, steps)
+        beta_2_interp = np.linspace(beta_2_auf, beta_2_ab, steps)
 
-        target1 = [0.9, 0.0, -0.05, 1]
-        target2 = [-0.2, 0.0, 0.25, 1]
+        # Create the initial robotic arm configuration for Pauf
+        arm = VGroup(
+            Line3D(base_auf, j1_auf, color=BLUE),
+            Line3D(j1_auf, j2_auf, color=GREEN),
+            Line3D(j2_auf, target_1[:3], color=RED),
+        )
+        self.add(arm)
 
-        target_point_1 = Dot3D(target1[0:3], color=CYAN1)
-        target_point_2 = Dot3D(target2[0:3], color=MAGENTA)
+        # Label Pauf pose
+        label_pauf = Text("Pauf Pose").to_edge(UL).set_color(BLUE)
+        self.add_fixed_in_frame_mobjects(label_pauf)
 
-        axes = ThreeDAxes(x_range=(-3, 3, 1), y_range=(-2, 2, 1), z_range=(-2, 2, 1))
+        # Desired total duration of the animation in seconds (e.g., 5 seconds)
+        total_duration = 5
+        # Calculate the run_time per frame
+        run_time_per_frame = total_duration / steps
 
-        # Add components to the scene
-        self.add(axes, axes.get_axis_labels(), plate, link1, link2, joint1, joint2, end_effector, target_point_1, target_point_2)
+        # Create a list of transformations
+        transforms = []
+        for alpha, beta1, beta2 in zip(alpha_interp, beta_1_interp, beta_2_interp):
+            base, j1, j2 = robot.get_points(alpha, beta1, beta2)
+            new_arm = VGroup(
+                Line3D(base, j1, color=BLUE),
+                Line3D(j1, j2, color=GREEN),
+                Line3D(j2, target_2[:3], color=RED),
+            )
+            transforms.append(ApplyMethod(arm.become, new_arm, run_time=run_time_per_frame))
 
+        # Play the sequence of transformations
+        self.play(*transforms)
 
-        try:
-            robot_config_Pauf = robot.inverse_kinematics(np.array(target1), elbow_up=True)
-        except OutOfWorkspace:
-            print("Using elbow down config for target 1")
-            robot_config_Pauf = robot.inverse_kinematics(np.array(target1), elbow_up=False)
+        # Add label for Pab pose after the transition
+        label_pab = Text("Pab Pose").to_edge(UR).set_color(RED)
+        self.add_fixed_in_frame_mobjects(label_pab)
 
-
-        try:
-            robot_config_Pab = robot.inverse_kinematics(np.array(target2), elbow_up=True)
-        except OutOfWorkspace:
-            print("Using elbow down config for target 2")
-            robot_config_Pab = robot.inverse_kinematics(np.array(target2), elbow_up=False)
-
-        run_time = 5 # seconds
-
-
-        def update_arm(arm_parts, alpha):
-            cc = robot_config_Pauf
-            base, j1, j2 = robot.get_points(cc[0], cc[1], cc[2])
-            joint1.move_to(base)
-            link1.put_start_and_end_on(base, j1)
-            joint2.move_to(j1)
-            link2.put_start_and_end_on(j1, j2)
-            end_effector.move_to(j2)
-
-        # Robot arm movement (controlled with alpha from 0 to 1)
-        self.play(UpdateFromAlphaFunc(
-            VGroup(link1, joint2, link2, end_effector), update_arm,
-            run_time=run_time, rate_func=linear
-        )   )
-
-        # Pause to admire the scene
+        # Hold the final pose for a moment
         self.wait(2)

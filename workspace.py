@@ -19,7 +19,7 @@ def plot_alpha_shape(filename: str, robot: Robot):
     x, y = alpha_shape_geom.exterior.xy
     plt.fill(x, y, fc="gray", ec="black", alpha=0.4, label="Working Area")
 
-    target = [0.5, 0.0, 0.8, 1]
+    target = [-0.4, 0.0, 0.5, 1]
     # target = [0.0, 0.0, 0.2, 1]
 
     try:
@@ -28,6 +28,7 @@ def plot_alpha_shape(filename: str, robot: Robot):
         print("Using elbow down config")
         alpha, beta_1, beta_2 = robot.inverse_kinematics(np.array(target), elbow_up=False)
 
+    print(f"{alpha}, {beta_1}, {beta_2}")
     base, j1, j2 = robot.get_points(alpha, beta_1, beta_2)
     plt.plot(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), 'ro-', label="Example Pose")
 
