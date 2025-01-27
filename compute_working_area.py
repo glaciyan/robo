@@ -27,6 +27,6 @@ def compute_and_save_alpha_shape(robot: Robot, filename: str, alpha: float):
 
 
 if __name__ == '__main__':
-    robot = Robot(x_r=0.0, y_r=0.0, theta=0, l=0, a=0, r=0, h=0, b=0)
+    robot = Robot(x_r=0.0, y_r=0.0, theta=0)
 
     compute_and_save_alpha_shape(robot, "alpha_shape_data.pkl", alpha=7)

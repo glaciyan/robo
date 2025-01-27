@@ -36,6 +36,6 @@ def plot_alpha_shape(filename: str, robot: Robot):
 
 
 if __name__ == '__main__':
-    robot = Robot(x_r=0.0, y_r=0.0, theta=0, l=0, a=0, r=0, h=0, b=0)
+    robot = Robot(x_r=0.0, y_r=0.0, theta=0)
 
     plot_alpha_shape("alpha_shape_data.pkl", robot)

@@ -6,37 +6,36 @@ from shapely.geometry import shape
 
 
 def plot_sim(robot: Robot):
-    plt.figure(figsize=(20, 10))
-    plt.xlabel("x")
-    plt.ylabel("z")
-    plt.axis("equal")
+    fig, axes = plt.subplots(1, 2, figsize=(20, 10))
 
     target_1 = [0.9, 0.0, -0.05, 1]
-    target_2 = [-0.2, -0.3, 0.25, 1]
+    target_2 = [-0.2, 0.0, 0.25, 1]
 
     alpha_auf, beta_1_auf, beta_2_auf = robot.inverse_kinematics(np.array(target_1), elbow_up=True)
+    base_auf, j1_auf, j2_auf = robot.get_points(alpha_auf, beta_1_auf, beta_2_auf)
 
-    base, j1, j2 = robot.get_points(alpha_auf, beta_1_auf, beta_2_auf)
-    ax = plt.subplot(1, 2, 1)
-    plt.axis("equal")
-    plt.xticks(np.array([base[0], j1[0], j2[0]]))
-    plt.yticks(np.array([base[2], j1[2], j2[2]]))
-    plt.scatter(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), c=[6,3,1], cmap="rainbow", label="Base")
-    plt.plot(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), 'r-', label="Pauf Pose")
-    plt.legend()
+    ax1 = axes[0]
+    ax1.set_title("Target 1 (Pauf Pose)")
+    ax1.set_xlabel("x")
+    ax1.set_ylabel("z")
+    ax1.axis("equal")
+    ax1.scatter([base_auf[0], j1_auf[0], j2_auf[0]], [base_auf[2], j1_auf[2], j2_auf[2]], c=[6, 3, 1], cmap="rainbow", label="Base")
+    ax1.plot([base_auf[0], j1_auf[0], j2_auf[0]], [base_auf[2], j1_auf[2], j2_auf[2]], 'r-', label="Pauf Pose")
+    ax1.legend()
 
     alpha_ab, beta_1_ab, beta_2_ab = robot.inverse_kinematics(np.array(target_2), elbow_up=True)
+    base_ab, j1_ab, j2_ab = robot.get_points(alpha_ab, beta_1_ab, beta_2_ab)
 
-    base, j1, j2 = robot.get_points(alpha_ab, beta_1_ab, beta_2_ab)
+    ax2 = axes[1]
+    ax2.set_title("Target 2 (Pab Pose)")
+    ax2.set_xlabel("x")
+    ax2.set_ylabel("z")
+    ax2.axis("equal")
+    ax2.scatter([base_ab[0], j1_ab[0], j2_ab[0]], [base_ab[2], j1_ab[2], j2_ab[2]], c=[6, 3, 1], cmap="rainbow", label="Base")
+    ax2.plot([base_ab[0], j1_ab[0], j2_ab[0]], [base_ab[2], j1_ab[2], j2_ab[2]], 'r-', label="Pab Pose")
+    ax2.legend()
 
-    plt.subplot(1, 2, 2)
-    plt.axis("equal")
-    plt.yticks(np.array([base[2], j1[2], j2[2]]))
-    plt.scatter(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), c=[6,3,1], cmap="rainbow", label="Base")
-    plt.plot(np.array([base[0], j1[0], j2[0]]), np.array([base[2], j1[2], j2[2]]), 'r-', label="Pab Pose")
-    
-
-    plt.legend()
+    plt.tight_layout()
     plt.savefig("plots/pick_up_sim.png")
 
     plt.figure(figsize=(10, 10))
@@ -58,5 +57,5 @@ def plot_sim(robot: Robot):
 
 
 if __name__ == '__main__':
-    robot = Robot(x_r=0.0, y_r=0.0, theta=0, l=0, a=0, r=0, h=0, b=0)
+    robot = Robot(x_r=0.0, y_r=0.0, theta=0)
     plot_sim(robot)

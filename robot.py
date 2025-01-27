@@ -69,7 +69,7 @@ class Robot:
         if beta_1 < self.beta_1_limit[0] or beta_1 > self.beta_1_limit[1]:
             raise OutOfWorkspace
 
-        alpha = azimuth
+        alpha = azimuth % (2 * np.pi)
 
         return alpha, beta_1, beta_2
 
