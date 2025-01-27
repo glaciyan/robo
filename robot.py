@@ -25,7 +25,7 @@ class Robot:
     def forward_kinematics(self, alpha=np.radians(0), beta_1=np.radians(0), beta_2=np.radians(0)):
         p_a2 = (0, 0, 0, 1)
         TR_0 = trans(np.array([self.x_r, self.y_r, self.r])) @ rot2trans(rotz(self.theta))
-        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha)) 
+        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha))
         TR_R = rot2trans(rotx(np.radians(90)))
         TR_A1 = rot2trans(rotz(beta_1)) @ trans(np.array([self.l_1, 0, 0]))
         TR_A2 = rot2trans(rotz(beta_2)) @ trans(np.array([self.l_2, 0, 0]))
@@ -76,7 +76,7 @@ class Robot:
     def get_points(self, alpha, beta_1, beta_2):
         p_a2 = (0, 0, 0, 1)
         TR_0 = trans(np.array([self.x_r, self.y_r, self.r])) @ rot2trans(rotz(self.theta))
-        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha)) 
+        TR_D = trans(np.array([self.l/2 - self.a/2, 0, self.h + self.b])) @ rot2trans(rotz(alpha))
         TR_R = rot2trans(rotx(np.radians(90)))
         T_BASE = TR_0 @ TR_D @ TR_R
 

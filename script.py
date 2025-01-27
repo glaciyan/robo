@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
-from robot import Robot
+from robot import Robot, OutOfWorkspace
 from shapely.geometry import shape
 
 
