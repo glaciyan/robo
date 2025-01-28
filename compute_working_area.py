@@ -7,12 +7,19 @@ from shapely.geometry import mapping
 
 def compute_reachable_points(robot: Robot):
     points = []
-    for p1 in np.linspace(robot.beta_1_limit[0], robot.beta_1_limit[1], 250):
-        for p2 in np.linspace(0, np.deg2rad(-180), 100):
-            for p3 in np.linspace(0, np.deg2rad(380), 100):
-                points.append((p1, p2, p3))
-    return np.array([robot.forward_kinematics(alpha, beta_1, beta_2) for beta_1, beta_2, alpha in points])
+    for beta_1 in np.linspace(robot.beta_1_limit[0], robot.beta_1_limit[1], 100):
+        for beta_2 in np.linspace(0, np.deg2rad(360), 50):
+            points.append((beta_1, beta_2))
+    return np.array([robot.forward_kinematics(0.0, beta_1, beta_2) for beta_1, beta_2 in points])
 
+
+def compute_reachable_points_with_alpha(robot: Robot):
+    points = []
+    for beta_1 in np.linspace(robot.beta_1_limit[0], robot.beta_1_limit[1], 100):
+        for beta_2 in np.linspace(0, np.deg2rad(360), 50):
+            for alpha in np.linspace(0, np.deg2rad(380), 50):
+                points.append((beta_1, beta_2, alpha))
+    return np.array([robot.forward_kinematics(alpha, beta_1, beta_2) for beta_1, beta_2, alpha in points])
 
 def compute_and_save_alpha_shape(robot: Robot, filename: str, alpha: float):
     reached_points = compute_reachable_points(robot)

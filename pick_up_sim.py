@@ -11,6 +11,9 @@ def plot_sim(robot: Robot):
     target_1 = [0.9, 0.0, -0.05, 1]
     target_2 = [-0.2, 0.3, 0.25, 1]
 
+
+
+
     alpha_auf, beta_1_auf, beta_2_auf = robot.inverse_kinematics(np.array(target_1), elbow_up=True)
     base_auf, j1_auf, j2_auf = robot.get_points(alpha_auf, beta_1_auf, beta_2_auf)
 
@@ -22,6 +25,9 @@ def plot_sim(robot: Robot):
     ax1.scatter([base_auf[0], j1_auf[0], j2_auf[0]], [base_auf[2], j1_auf[2], j2_auf[2]], c=[6, 3, 1], cmap="rainbow", label="Base")
     ax1.plot([base_auf[0], j1_auf[0], j2_auf[0]], [base_auf[2], j1_auf[2], j2_auf[2]], 'r-', label="Pauf Pose")
     ax1.legend()
+
+
+
 
     alpha_ab, beta_1_ab, beta_2_ab = robot.inverse_kinematics(np.array(target_2), elbow_up=True)
     base_ab, j1_ab, j2_ab = robot.get_points(alpha_ab, beta_1_ab, beta_2_ab)
@@ -42,9 +48,13 @@ def plot_sim(robot: Robot):
     # alpha_ab = 1.4
     alpha_interp = np.linspace(alpha_auf, alpha_ab - np.deg2rad(360), 100)
     alpha_left_interp = np.linspace(alpha_auf, alpha_ab, 100)
-    print(f"{np.rad2deg(alpha_ab)} {np.rad2deg(alpha_ab - np.deg2rad(360))}")
+    # print(f"{np.rad2deg(alpha_ab)} {np.rad2deg(alpha_ab - np.deg2rad(360))}")
+
+
+
     beta_1_interp = np.linspace(beta_1_auf, beta_1_ab, 100)
     beta_2_interp = np.linspace(beta_2_auf, beta_2_ab, 100)
+
     plt.plot(np.rad2deg(alpha_interp), "gray" if np.abs(alpha_ab - np.deg2rad(360) * np.sign(360)) >= np.pi else "r", label="alpha right rotation")
     plt.plot(np.rad2deg(alpha_left_interp), "gray" if np.abs(alpha_ab) > np.pi else "r", label="alpha left rotation")
     plt.plot(np.rad2deg(beta_1_interp), label="beta 1")
