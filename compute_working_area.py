@@ -17,7 +17,7 @@ def compute_reachable_points_with_alpha(robot: Robot):
     points = []
     for beta_1 in np.linspace(robot.beta_1_limit[0], robot.beta_1_limit[1], 100):
         for beta_2 in np.linspace(0, np.deg2rad(360), 50):
-            for alpha in np.linspace(0, np.deg2rad(380), 50):
+            for alpha in np.linspace(0, np.deg2rad(360), 50):
                 points.append((beta_1, beta_2, alpha))
     return np.array([robot.forward_kinematics(alpha, beta_1, beta_2) for beta_1, beta_2, alpha in points])
 
